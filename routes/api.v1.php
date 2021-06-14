@@ -1,22 +1,19 @@
 <?php
 
-use App\Http\Controllers\BookController;
-use Illuminate\Http\Request;
+use App\Http\Controllers\Api\V1\BooksController;
+use App\Http\Controllers\Api\V1\AuthorsController;
+use App\Http\Middleware\EnsureBookBelongsToAuthor;
 use Illuminate\Support\Facades\Route;
 
-/*
-|--------------------------------------------------------------------------
-| API Routes
-|--------------------------------------------------------------------------
-|
-| Here is where you can register API routes for your application. These
-| routes are loaded by the RouteServiceProvider within a group which
-| is assigned the "api" middleware group. Enjoy building your API!
-|
-*/
+Route::get('books', [BooksController::class, 'index']);
+Route::get('books/{book}', [BooksController::class, 'show']);
 
-Route::middleware('auth:api')->get('/user', function (Request $request) {
-    return $request->user();
-});
+Route::apiResource('authors', AuthorsController::class);
 
-Route::resource('books', BookController::class);
+Route::prefix('authors/{author}')
+    ->middleware(EnsureBookBelongsToAuthor::class)
+    ->group(fn ($a) => Route::apiResource('books', BooksController::class));
+
+Route::fallback(function () {
+    return response()->json(['message' => 'Not Found.'], 404);
+})->name('404');

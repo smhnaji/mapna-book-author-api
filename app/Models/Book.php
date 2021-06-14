@@ -3,9 +3,8 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
 
-class Book extends Model
+class Book extends BaseModel
 {
     use HasFactory;
 
@@ -14,4 +13,13 @@ class Book extends Model
         'page_count',
     ];
 
+    /**
+     * author
+     *
+     * @return relation
+     */
+    public function author()
+    {
+        return $this->belongsTo(Author::class);
+    }
 }
